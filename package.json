@@ -1,13 +1,10 @@
 {
   "name": "iotd",
-  "main": "./dist/iotd.js",
+  "main": "./lib/potd.js",
   "version": "0.0.1",
-  "description": "Gets images of the day from National Geographic.",
+  "description": "Scrapes photos of the day from National Geographic.",
   "contributors": [
-    {
-      "name": "Harvey Williams",
-      "email": ""
-    }
+    "Harvey Williams"
   ],
   "repository": {
     "type": "git",
@@ -29,5 +26,17 @@
     "merge2": "^1.0.2",
     "mocha": "^2.5.3",
     "node-notifier": "^4.5.0"
-  }
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "photo",
+    "image",
+    "day",
+    "national",
+    "geographic"
+  ],
+  "author": "Harvey Williams",
+  "license": "MIT"
 }

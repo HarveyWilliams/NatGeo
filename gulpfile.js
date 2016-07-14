@@ -38,14 +38,14 @@ gulp.task('typescript', function() {
 		*/
 		
 	return merge([
-		tsResult.dts.pipe(gulp.dest('typings/iotd')),
+		tsResult.dts.pipe(gulp.dest('typings/potd')),
 		tsResult.js.pipe(gulp.dest('lib'))
 	]);
 });
 
 gulp.task('mocha', function() {
 	return gulp.src([
-		'lib/iotd-test.js'
+		'lib/potd-tests.js'
 	])
 	.pipe(mocha());
 });

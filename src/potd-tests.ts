@@ -5,13 +5,13 @@
 var chai: Chai.ChaiStatic = require('chai');
 var expect = chai.expect;
 
-var nationalGeographic = require('./iotd');
+var natGeo = require('./potd');
 
-describe('iotd', function() {
+describe('potd', function() {
     it('getDataFromPage() should return an object', function(done) {
-        let iotd = new nationalGeographic.imageOfTheDay();
+        let potd = new natGeo.photoOfTheDay();
 
-        iotd.getDataFromPage(function(data: Object) {
+        potd.getDataFromPage(function(data: Object) {
             expect(typeof data).to.equal('object')
 
             done();
@@ -19,17 +19,17 @@ describe('iotd', function() {
     });
 
     it('getDataFromPage(function, "http://photography.nationalgeographic.com/photography/photo-of-the-day/skye-scotland-seal/") should return return an object with correct values', function(done) {
-        let iotd = new nationalGeographic.imageOfTheDay();
+        let potd = new natGeo.photoOfTheDay();
 
         let expectedData = {
-            url: 'http://images.nationalgeographic.com/wpf/media-live/photos/000/952/cache/skye-scotland-seal_95219_990x742.jpg',
+            url: 'http://photos.nationalgeographic.com/wpf/media-live/photos/000/952/cache/skye-scotland-seal_95219_990x742.jpg',
             date: new Date('JULY 8, 2016'),
             name: 'The Water\'s Fine',
             credit: 'Photograph by Igor Mohoric Bonca, National Geographic Your Shot',
             description: 'A seal readies itself to dive into the waters near Dunvegan Castle on Scotland’s Isle of Skye. The pinnipeds are abundant along Scotland’s coastline—and can be quite photogenic.'
         };
 
-        iotd.getDataFromPage(function(data: any) {
+        potd.getDataFromPage(function(data: any) {
             expect(data.url).to.equal(expectedData.url);
             expect(data.date.getTime()).to.equal(expectedData.date.getTime());
             expect(data.name).to.equal(expectedData.name);
@@ -42,9 +42,9 @@ describe('iotd', function() {
 
     // 31 days in January.
     it('getArchivedPhotoUrls() should return an array of length 31 for January', function(done) {
-        let iotd = new nationalGeographic.imageOfTheDay();
+        let potd = new natGeo.photoOfTheDay();
 
-        iotd.getArchivedPhotoUrls(1, 2016, function(data: string[]) {
+        potd.getArchivedPhotoUrls(1, 2016, function(data: string[]) {
             expect(data.length).to.equal(31);
 
             done();
@@ -52,9 +52,9 @@ describe('iotd', function() {
     });
 
     it('getArchivedPhotoUrls() should return URLs', function(done) {
-        let iotd = new nationalGeographic.imageOfTheDay();
+        let potd = new natGeo.photoOfTheDay();
 
-        iotd.getArchivedPhotoUrls(1, 2016, function(data: string[]) {
+        potd.getArchivedPhotoUrls(1, 2016, function(data: string[]) {
             // http://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
             let pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
                 '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
@@ -70,17 +70,17 @@ describe('iotd', function() {
     });
 
     it('getDataFromHtml() should parse HTML and get correct values', function() {
-        let iotd = new nationalGeographic.imageOfTheDay();
+        let potd = new natGeo.photoOfTheDay();
 
         let inputData = {
-            url: '//images.site.com/path/to/file.jpg',
+            url: '//photos.site.com/path/to/file.jpg',
             date: 'JANUARY 1, 2001',
             name: 'Title Of The Image',
             credit: 'Credit of the photo',
-            description: 'Description of the image'
+            description: 'Description of the photo'
         };
 
-        let outputData = iotd.getDataFromHtml(`
+        let outputData = potd.getDataFromHtml(`
             <html>
                 <head>
                 </head>
@@ -106,22 +106,22 @@ describe('iotd', function() {
         expect(outputData.description).to.equal(inputData.description);
     });
 
-    // Currently, the latest archived photos return in a 6 by 6 grid (36 images).
+    // Currently, the latest archived photos return in a 6 by 6 grid (36 photos).
     it('getLatestArchivedPhotoUrls() should return an array of length 36', function(done) {
-        let iotd = new nationalGeographic.imageOfTheDay();
+        let potd = new natGeo.photoOfTheDay();
 
-        iotd.getLatestArchivedPhotoUrls(1, function(data: string[]) {
+        potd.getLatestArchivedPhotoUrls(1, function(data: string[]) {
             expect(data.length).to.equal(36);
 
             done();
         })
     });
 
-    // If the pagination is out of range, no images are available but the page still renders. I'm gonna assume that there will never be 1,000,000 pages...
+    // If the pagination is out of range, no photos are available but the page still renders. I'm gonna assume that there will never be 1,000,000 pages...
     it('getLatestArchivedPhotoUrls(1000000) should return an array of length 0', function(done) {
-        let iotd = new nationalGeographic.imageOfTheDay();
+        let potd = new natGeo.photoOfTheDay();
 
-        iotd.getLatestArchivedPhotoUrls(1000000, function(data: string[]) {
+        potd.getLatestArchivedPhotoUrls(1000000, function(data: string[]) {
             expect(data.length).to.equal(0);
 
            done();
@@ -130,9 +130,9 @@ describe('iotd', function() {
 
     /*
     it('getAllArchivedPhotoUrlsSync() should return a large array of strings', function() {
-        let iotd = new nationalGeographic.imageOfTheDay();
+        let potd = new natGeo.photoOfTheDay();
 
-        let urls = iotd.getAllArchivedPhotoUrlsSync();
+        let urls = potd.getAllArchivedPhotoUrlsSync();
 
         // At the time of writing, there are over 2500 photos.
         expect(urls.length).to.be.above(2500);
@@ -143,10 +143,10 @@ describe('iotd', function() {
     it('getAllArchivedPhotoUrls() should return multiple arrays of strings', function(done) {
         this.timeout(100000);
 
-        let iotd = new nationalGeographic.imageOfTheDay();
+        let potd = new natGeo.photoOfTheDay();
         let i = 0;
 
-        iotd.getAllArchivedPhotoUrls(function(urls: string[], done: boolean) {
+        potd.getAllArchivedPhotoUrls(function(urls: string[], done: boolean) {
             if (done) {
                 expect(i).to.be.above(70);
 

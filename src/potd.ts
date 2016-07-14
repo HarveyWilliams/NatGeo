@@ -8,39 +8,39 @@ import cheerio = require('cheerio');
 import request = require('request');
 var syncRequest = require('sync-request');
 
-namespace nationalGeographic {
+namespace natGeo {
 	/**
 	 * The config that is parsed into the main method.
 	 * 
 	 * @export
 	 * @interface Config
 	 */
-	interface Config {
+	interface config {
 		saveFile: boolean;
 		baseUrl: string;
 		waitTime: number;
 	}
 	/**
-	 * The image data scraped from the HTML page.
+	 * The photo data scraped from the HTML page.
 	 * 
 	 * @export
 	 * @interface ImageData
 	 */
-	interface ImageData {
+	interface photoData {
 		/**
-		 * URL to the image itself.
+		 * URL to the photo itself.
 		 * 
 		 * @type {string}
 		 */
 		url: string;
 		/**
-		 * Date the image was posted.
+		 * Date the photo was posted.
 		 * 
 		 * @type {Date}
 		 */
 		date: Date;
 		/**
-		 * Name of the image.
+		 * Name of the photo.
 		 * 
 		 * @type {string}
 		 */
@@ -52,19 +52,25 @@ namespace nationalGeographic {
 		 */
 		credit: string;
 		/**
-		 * Information about the image itself.
+		 * Information about the photo itself.
 		 * 
 		 * @type {string}
 		 */
 		description: string;
 	}
-	export class imageOfTheDay {
+	/**
+	 * Methods for getting the current photo of hte day and previous photos of the day.
+	 * 
+	 * @export
+	 * @class photoOfTheDay
+	 */
+	export class photoOfTheDay {
 		/**
 		 * Default constructor.
 		 * 
-		 * @type {Config} Configure the istance of the image scraper.
+		 * @type {Config} Configure the instance of the photo scraper.
 		 */
-		constructor(public config?: Config) {
+		constructor(public config?: config) {
 			if (config == null) { config = { baseUrl: null, saveFile: null, waitTime: null }; }
 
 			this.config = {
@@ -76,7 +82,7 @@ namespace nationalGeographic {
 		/**
 		 * Get data for images from the archive.
 		 * 
-		 * @param {number} month The month to get the archived images for (ranging from 1 to 12).
+		 * @param {number} month The month to get the archived photos for (ranging from 1 to 12).
 		 * @param {number} year The year to get the archived photos for.
 		 * @param {Function} [callback] Callback that should be run once the data has been retrieved.
 		 */
@@ -84,15 +90,15 @@ namespace nationalGeographic {
 			var _this = this;
 
 			this.getArchivedPhotoUrls(month, year, function (photoPageUrls: string[]) {
-				var imageData: ImageData[] = [];
+				var photoData: photoData[] = [];
 
 				for (var i = 0; i < photoPageUrls.length; i++) {
-					_this.getDataFromPage(function (data: ImageData) {
-						imageData.push(data);
+					_this.getDataFromPage(function (data: photoData) {
+						photoData.push(data);
 					}, photoPageUrls[i]);
 				}
 
-				callback(imageData);
+				callback(photoData);
 
 				return;
 			});
@@ -171,7 +177,7 @@ namespace nationalGeographic {
 			return allUrls;
 		}
 		/**
-		 * Get URLs for the image of the day fron the archive, sorted by latest released first.
+		 * Get URLs for the photo of the day fron the archive, sorted by latest released first.
 		 * This method is not recommended as the web page may take a long time to respond.
 		 * 
 		 * @param {number} page The current page to look at, page 1 holding the most recent photos.
@@ -182,10 +188,10 @@ namespace nationalGeographic {
 			return this.getArchivedPhotosFromHtml(syncRequest('GET', url).getBody());
 		}
 		/**
-		 * Get URLs for the image of the day fron the archive, sorted by latest released first.
+		 * Get URLs for the photo of the day fron the archive, sorted by latest released first.
 		 * 
 		 * @param {number} page The current page to look at, page 1 holding the most recent photos.
-		 * @param {Function} [callback] Callback that should be run once the URLs for the image pages have been retrieved.
+		 * @param {Function} [callback] Callback that should be run once the URLs for the photo pages have been retrieved.
 		 */
 		public getLatestArchivedPhotoUrls(page: number, callback: Function) {
 			let _this = this;
@@ -209,11 +215,11 @@ namespace nationalGeographic {
 			})
 		}
 		/**
-		 * Get URLs for the image of the day from the archive, sorted by latest first in a given month and year.
+		 * Get URLs for the photo of the day from the archive, sorted by latest first in a given month and year.
 		 * 
-		 * @param {number} month The month to get the archived images for (ranging from 1 to 12).
-		 * @param {number} year The year to get the archived images for.
-		 * @param {Function} [callback] Callback that should be run once the URLs for the image pages have been retrieved.
+		 * @param {number} month The month to get the archived photos for (ranging from 1 to 12).
+		 * @param {number} year The year to get the archived photos for.
+		 * @param {Function} [callback] Callback that should be run once the URLs for the photo pages have been retrieved.
 		 */
 		public getArchivedPhotoUrls(month: number, year: number, callback: Function) {
 			let _this = this;
@@ -237,7 +243,7 @@ namespace nationalGeographic {
 			});
 		}
 		/**
-		* Loads image information from a National Geographic page.
+		* Loads photo information from a National Geographic page.
 		* 
 		* @param {Function} [callback] A function that is ran when the page is successfully scraped. The scrape data will be put into the callback.
 		* @param {string} [url='http://photography.nationalgeographic.com/photography/photo-of-the-day/'] Set the URL which should be scraped.
@@ -261,16 +267,16 @@ namespace nationalGeographic {
 			});
 		}
 		/**
-		 * Loads image information from a National Geographic page synchronously.
+		 * Loads photo information from a National Geographic page synchronously.
 		 * 
 		 * @param {string} [url=this.config.baseUrl + 'photography/photo-of-the-dat/'] Set the URL which should be scraped.
 		 * @returns {ImageData}
 		 */
-		public getDataFromPageSync(url: string = this.config.baseUrl + 'photography/photo-of-the-dat/'): ImageData {
+		public getDataFromPageSync(url: string = this.config.baseUrl + 'photography/photo-of-the-dat/'): photoData {
 			return this.getDataFromHtml((syncRequest('GET', url).getBody()));
 		}
 		/**
-		 * Load data about an image from an HTML document.
+		 * Load data about an photo from an HTML document.
 		 * 
 		 * @param {string} filePath File system file path to the target HTML file (including file name and file type).
 		 * @param {Function} callback This callback is run when the data is successfully retrieved.
@@ -289,7 +295,7 @@ namespace nationalGeographic {
 			});
 		}
 		/**
-		 * Load a list of URLs from an HTML document. HTML page should be a page containg archived images.
+		 * Load a list of URLs from an HTML document. HTML page should be a page containg archived photos.
 		 * 
 		 * @param {string} html The HTML that should be parsed.
 		 * @returns {string[]}
@@ -311,10 +317,10 @@ namespace nationalGeographic {
 		 * @param {string} html The HTML that should be parsed.
 		 * @returns {Background}
 		 */
-		public getDataFromHtml(html: string): ImageData {
+		public getDataFromHtml(html: string): photoData {
 			let $ = cheerio.load(html);
 
-			let imageData: ImageData = {
+			let photoData: photoData = {
 				url: 'http:' + $('.primary_photo img').attr('src'),
 				date: new Date($('.publication_time').eq(0).text()),
 				name: $('h1').text(),
@@ -322,12 +328,12 @@ namespace nationalGeographic {
 				description: $('#caption .credit').next().text()
 			};
 			
-			return imageData;
+			return photoData;
 		}
 		/**
-		 * Retrieve an image from a URL and saves it to a place on the file system.
+		 * Retrieve an photo from a URL and saves it to a place on the file system.
 		 * 
-		 * @param  {string} url URL to the target image.
+		 * @param  {string} url URL to the target photo.
 		 * @param  {string} filePath File path complete with file name (and file type) for where the retrieved file should be placed.
 		 * @param  {Function} callback Callback that should be called after the file has been successfully saved.
 		 */
@@ -337,4 +343,4 @@ namespace nationalGeographic {
 	}
 }
 
-module.exports = nationalGeographic;
+module.exports = natGeo;

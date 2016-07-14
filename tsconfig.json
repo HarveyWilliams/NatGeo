@@ -9,7 +9,7 @@
 		"declaration": true,
         "sourceMap": true,
         "noResolve": true,
-        "rootDir": "iotd"
+        "rootDir": "src"
     },
     "exclude": [
         "node_modules"
