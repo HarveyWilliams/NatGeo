@@ -29,7 +29,7 @@ Obviously, National Geographic is a free nonprofit, so please use this package w
 ### Basic usage
 
 ```javascript
-var natGeo = require('path/to/iotd.js');
+var natGeo = require('path/to/potd.js');
 
 var potd = new natGeo.photoOfTheDay();
 
