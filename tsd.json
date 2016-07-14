@@ -1,0 +1,30 @@
+{
+  "version": "v4",
+  "repo": "borisyankov/DefinitelyTyped",
+  "ref": "master",
+  "path": "typings",
+  "bundle": "typings/tsd.d.ts",
+  "installed": {
+    "cheerio/cheerio.d.ts": {
+      "commit": "19b6e80e68f7dec21e453c225680fe3d9899e946"
+    },
+    "node/node.d.ts": {
+      "commit": "19b6e80e68f7dec21e453c225680fe3d9899e946"
+    },
+    "request/request.d.ts": {
+      "commit": "19b6e80e68f7dec21e453c225680fe3d9899e946"
+    },
+    "form-data/form-data.d.ts": {
+      "commit": "19b6e80e68f7dec21e453c225680fe3d9899e946"
+    },
+    "mocha/mocha.d.ts": {
+      "commit": "8ff899a355ef0ad25397fcfdaafe430428acd300"
+    },
+    "assertion-error/assertion-error.d.ts": {
+      "commit": "8ff899a355ef0ad25397fcfdaafe430428acd300"
+    },
+    "chai/chai.d.ts": {
+      "commit": "8ff899a355ef0ad25397fcfdaafe430428acd300"
+    }
+  }
+}

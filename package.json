@@ -1,0 +1,33 @@
+{
+  "name": "iotd",
+  "main": "./dist/iotd.js",
+  "version": "0.0.1",
+  "description": "Gets images of the day from National Geographic.",
+  "contributors": [
+    {
+      "name": "Harvey Williams",
+      "email": ""
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "harveywilliams.net"
+  },
+  "dependencies": {
+    "cheerio": "^0.20.0",
+    "request": "^2.69.0",
+    "sync-request": "^3.0.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "gulp": "^3.9.0",
+    "gulp-autoprefixer": "^2.3.1",
+    "gulp-mocha": "^2.2.0",
+    "gulp-notify": "^2.2.0",
+    "gulp-plumber": "^1.0.1",
+    "gulp-typescript": "^2.13.6",
+    "merge2": "^1.0.2",
+    "mocha": "^2.5.3",
+    "node-notifier": "^4.5.0"
+  }
+}

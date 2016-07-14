@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+		"noImplicitAny": true,
+		"removeComments": false,
+		"noLib": false,
+		"preserveConstEnums": true,
+		"declaration": true,
+        "sourceMap": true,
+        "noResolve": true,
+        "rootDir": "iotd"
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}
