@@ -16,7 +16,8 @@ namespace natGeo {
 	 * @interface Config
 	 */
 	interface config {
-		saveFile: boolean;
+		savePhoto: boolean;
+		savePhotoDirectory: string;
 		baseUrl: string;
 		waitTime: number;
 	}
@@ -71,11 +72,12 @@ namespace natGeo {
 		 * @type {Config} Configure the instance of the photo scraper.
 		 */
 		constructor(public config?: config) {
-			if (config == null) { config = { baseUrl: null, saveFile: null, waitTime: null }; }
+			if (config == null) { config = { baseUrl: null, savePhoto: null, savePhotoDirectory: null, waitTime: null }; }
 
 			this.config = {
 				baseUrl: config.baseUrl || 'http://photography.nationalgeographic.com',
-				saveFile: config.saveFile || false,
+				savePhoto: config.savePhoto || false,
+				savePhotoDirectory: config.savePhotoDirectory || null,
 				waitTime: config.waitTime || 100
 			};
 		}
@@ -285,9 +287,14 @@ namespace natGeo {
 					return;
 				}
 
-				let background = _this.getDataFromHtml(html);
+				let data = _this.getDataFromHtml(html);
+				let extension = data.url.split('.')[data.url.split('.').length - 1] ;
 
-				callback(background);
+				if (_this.config.savePhotoDirectory != null) {
+					_this.savePhoto(data.url, _this.config.savePhotoDirectory, `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.${extension}`);
+				}
+
+				callback(data);
 			});
 		}
 		/**
@@ -358,11 +365,14 @@ namespace natGeo {
 		 * Retrieve an photo from a URL and saves it to a place on the file system.
 		 * 
 		 * @param  {string} url URL to the target photo.
-		 * @param  {string} filePath File path complete with file name (and file type) for where the retrieved file should be placed.
-		 * @param  {Function} callback Callback that should be called after the file has been successfully saved.
+		 * @param  {string} filePath File path for where the retrieved file should be placed.
+		 * @param  {string} fileName File name complete with extension that the file should be named.
+		 * @param  {Function} [callback] Callback that should be called after the file has been successfully saved.
 		 */
-		public saveImage(url: string, filePath: string, callback: Function) {
-			request(url).pipe(fs.createWriteStream(filePath)).on('close', callback);
+		public savePhoto(url: string, filePath: string, fileName: string, callback?: Function): void {
+			callback = callback || function() {};
+
+			request(url).pipe(fs.createWriteStream(filePath + fileName)).on('close', callback);
 		}
 	}
 }
