@@ -45,7 +45,7 @@ gulp.task('typescript', function() {
 
 gulp.task('mocha', function() {
 	return gulp.src([
-		'lib/potd-tests.js'
+		'tests/potd-tests.js'
 	])
 	.pipe(mocha());
 });
@@ -54,7 +54,7 @@ gulp.task('mocha', function() {
 gulp.task('watch', function() {
 	// Watch .js files
 	gulp.watch('src/**/*.ts', ['typescript']);
-	gulp.watch('lib/**/*.js', ['mocha']);
+	gulp.watch('tests/**/*.js', ['mocha']);
 });
 
 // Default - runs the scripts, styles and watch tasks: 'gulp' will run this task.

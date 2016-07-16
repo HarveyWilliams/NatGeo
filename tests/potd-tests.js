@@ -2,18 +2,20 @@
 /// <reference path="../typings/mocha/mocha.d.ts"/>
 /// <reference path="../typings/chai/chai.d.ts"/>
 
-import fs = require('fs');
-import chai = require('chai');
+"use-strict";
+
+var fs = require('fs');
+var chai = require('chai');
 
 var expect = chai.expect;
 
-var natGeo = require('./potd');
+var natGeo = require('../');
 
 describe('potd', function() {
     it('getDataFromPage() should return an object', function(done) {
         let potd = new natGeo.photoOfTheDay();
 
-        potd.getDataFromPage(function(data: Object) {
+        potd.getDataFromPage(function(data) {
             expect(typeof data).to.equal('object')
 
             done();
@@ -31,7 +33,7 @@ describe('potd', function() {
             description: 'A seal readies itself to dive into the waters near Dunvegan Castle on Scotland’s Isle of Skye. The pinnipeds are abundant along Scotland’s coastline—and can be quite photogenic.'
         };
 
-        potd.getDataFromPage(function(data: any) {
+        potd.getDataFromPage(function(data) {
             expect(data.url).to.equal(expectedData.url);
             expect(data.date.getTime()).to.equal(expectedData.date.getTime());
             expect(data.name).to.equal(expectedData.name);
@@ -46,7 +48,7 @@ describe('potd', function() {
     it('getArchivedPhotoUrls() should return an array of length 31 for January', function(done) {
         let potd = new natGeo.photoOfTheDay();
 
-        potd.getArchivedPhotoUrls(1, 2016, function(data: string[]) {
+        potd.getArchivedPhotoUrls(1, 2016, function(data) {
             expect(data.length).to.equal(31);
 
             done();
@@ -56,7 +58,7 @@ describe('potd', function() {
     it('getArchivedPhotoUrls() should return URLs', function(done) {
         let potd = new natGeo.photoOfTheDay();
 
-        potd.getArchivedPhotoUrls(1, 2016, function(data: string[]) {
+        potd.getArchivedPhotoUrls(1, 2016, function(data) {
             // http://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
             let pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
                 '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
@@ -112,7 +114,7 @@ describe('potd', function() {
     it('getLatestArchivedPhotoUrls() should return an array of length 36', function(done) {
         let potd = new natGeo.photoOfTheDay();
 
-        potd.getLatestArchivedPhotoUrls(1, function(data: string[]) {
+        potd.getLatestArchivedPhotoUrls(1, function(data) {
             expect(data.length).to.equal(36);
 
             done();
@@ -123,7 +125,7 @@ describe('potd', function() {
     it('getLatestArchivedPhotoUrls(1000000) should return an array of length 0', function(done) {
         let potd = new natGeo.photoOfTheDay();
 
-        potd.getLatestArchivedPhotoUrls(1000000, function(data: string[]) {
+        potd.getLatestArchivedPhotoUrls(1000000, function(data) {
             expect(data.length).to.equal(0);
 
            done();
@@ -145,7 +147,7 @@ describe('potd', function() {
         let potd = new natGeo.photoOfTheDay();
         let i = 0;
 
-        potd.getAllArchivedPhotoUrls(function(urls: string[], finished: boolean) {
+        potd.getAllArchivedPhotoUrls(function(urls, finished) {
             if (finished) {
                 expect(i).to.be.above(70);
 
@@ -161,7 +163,7 @@ describe('potd', function() {
 
         let potd = new natGeo.photoOfTheDay();
 
-        potd.getDataByDate('2016/02/07', function(data: any) {
+        potd.getDataByDate('2016/02/07', function(data) {
             expect(data.date.getTime()).to.equal(new Date('FEBRUARY 7, 2016').getTime(  ));
 
             done();
@@ -175,7 +177,7 @@ describe('potd', function() {
             saveDataDirectory: savePath
         });
 
-        potd.getDataFromPage(function(data: any) {
+        potd.getDataFromPage(function(data) {
             let fileNameShouldBe = `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.json`;
 
             console.log(savePath + fileNameShouldBe);
@@ -184,5 +186,5 @@ describe('potd', function() {
 
             done();
         });
-    };
+    });
 });
