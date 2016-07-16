@@ -16,9 +16,29 @@ namespace natGeo {
 	 * @interface Config
 	 */
 	interface config {
-		savePhoto: boolean;
-		savePhotoDirectory: string;
+		/**
+		 * The base URL end point for the remote server such as 'http://photography.nationalgeographic.com'.
+		 * 
+		 * @type {string}
+		 */
 		baseUrl: string;
+		/**
+		 * If specified, this will be the location where the JSON blobs of photo data should be saved after it has been retrieved.
+		 * 
+		 * @type {string}
+		 */
+		saveDataDirectory: string;
+		/**
+		 * If specified, this will be the location where the photo file should be saved after it has been retrieved.
+		 * 
+		 * @type {string}
+		 */
+		savePhotoDirectory: string;
+		/**
+		 * The wait time before successive calls should be made to the remote server.
+		 * 
+		 * @type {number}
+		 */
 		waitTime: number;
 	}
 	/**
@@ -72,11 +92,18 @@ namespace natGeo {
 		 * @type {Config} Configure the instance of the photo scraper.
 		 */
 		constructor(public config?: config) {
-			if (config == null) { config = { baseUrl: null, savePhoto: null, savePhotoDirectory: null, waitTime: null }; }
+			if (config == null) {
+				config = {
+					baseUrl: null,
+					saveDataDirectory: null,
+					savePhotoDirectory:  null,
+					waitTime:  100
+				};
+			}
 
 			this.config = {
 				baseUrl: config.baseUrl || 'http://photography.nationalgeographic.com',
-				savePhoto: config.savePhoto || false,
+				saveDataDirectory: config.saveDataDirectory || null,
 				savePhotoDirectory: config.savePhotoDirectory || null,
 				waitTime: config.waitTime || 100
 			};
@@ -294,6 +321,10 @@ namespace natGeo {
 					_this.savePhoto(data.url, _this.config.savePhotoDirectory, `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.${extension}`);
 				}
 
+				if (_this.config.saveDataDirectory != null) {
+					_this.saveData(data, _this.config.saveDataDirectory, `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.json`);
+				}
+
 				callback(data);
 			});
 		}
@@ -373,6 +404,25 @@ namespace natGeo {
 			callback = callback || function() {};
 
 			request(url).pipe(fs.createWriteStream(filePath + fileName)).on('close', callback);
+		}
+		/**
+		 * Save an object to a file.
+		 * 
+		 * @param {photoData} data The data that should be saved to the file.
+		 * @param {string} filePath The directory where the file should be saved to.
+		 * @param {string} fileName The name of the file complete with extension that the file should be named.
+		 * @param {Function} [callback] Callback that should be called after the file has been saved.
+		 */
+		public saveData(data: photoData, filePath: string, fileName: string, callback?: Function): void {
+			callback = callback || function() {};
+
+			fs.writeFile(filePath + fileName, JSON.stringify(data, null, 4), function(err) {
+				if (err) {
+					console.log('[backgrounds] Error saving JSON data to file.');
+				}
+
+				callback();
+			});
 		}
 	}
 }

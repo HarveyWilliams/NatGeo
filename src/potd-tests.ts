@@ -2,7 +2,9 @@
 /// <reference path="../typings/mocha/mocha.d.ts"/>
 /// <reference path="../typings/chai/chai.d.ts"/>
 
-var chai: Chai.ChaiStatic = require('chai');
+import fs = require('fs');
+import chai = require('chai');
+
 var expect = chai.expect;
 
 var natGeo = require('./potd');
@@ -154,7 +156,7 @@ describe('potd', function() {
         }, 200);
     });
 
-    it('getDataByDate() shoukd return data with correct date', function(done) {
+    it('getDataByDate() should return data with correct date', function(done) {
         this.timeout(4000);
 
         let potd = new natGeo.photoOfTheDay();
@@ -165,4 +167,22 @@ describe('potd', function() {
             done();
         });
     });
+
+    it('getDataFromPage() should save JSON data to a file', function(done) {
+        let savePath = process.cwd() + '\\data\\';
+
+        let potd = new natGeo.photoOfTheDay({
+            saveDataDirectory: savePath
+        });
+
+        potd.getDataFromPage(function(data: any) {
+            let fileNameShouldBe = `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.json`;
+
+            console.log(savePath + fileNameShouldBe);
+
+            expect(fs.existsSync(savePath + fileNameShouldBe)).to.equal(true);
+
+            done();
+        });
+    };
 });
