@@ -74,23 +74,47 @@ namespace natGeo {
 			if (config == null) { config = { baseUrl: null, saveFile: null, waitTime: null }; }
 
 			this.config = {
-				baseUrl: config.baseUrl == null ? 'http://photography.nationalgeographic.com' : config.baseUrl,
-				saveFile: config.saveFile == null ? false : config.saveFile,
-				waitTime: config.waitTime == null ? 100 : config.waitTime
+				baseUrl: config.baseUrl || 'http://photography.nationalgeographic.com',
+				saveFile: config.saveFile || false,
+				waitTime: config.waitTime || 100
 			};
 		}
 		/**
-		 * Get data for images from the archive.
+		 * Get a single photos data by the date the photo was published.
+		 * If you are building a local archive of all of the photos, this method might not be for you! It makes two calls to National Geographic for every photo scraped. Use 'getAllArchivedPhotoData()' instead.
+		 * 
+		 * @param {string} dateAsString A date that can be parsed by the new Date() function.
+		 * @param {Function} callback Callback that should be run once the data has been retrieved.
+		 * @returns {void}
+		 */
+		public getDataByDate(dateAsString: string, callback: Function): void {
+			let _this = this;
+
+			let date = new Date(dateAsString);
+			let daysInMonth = new Date(date.getFullYear(), date.getMonth(), 0).getDate();
+
+			this.getArchivedPhotoUrls(date.getMonth() + 1, date.getFullYear(), function(urls : string) {
+				let url = urls[daysInMonth - date.getDate() - 2];
+
+				_this.getDataFromPage(function(data: photoData) {
+					callback(data);
+				}, url);
+			});
+
+			return;
+		}
+		/**
+		 * Get data for photos from the archive.
 		 * 
 		 * @param {number} month The month to get the archived photos for (ranging from 1 to 12).
-		 * @param {number} year The year to get the archived photos for.
+		 * @param {number} year The full year (such as 2016) to get the archived photos for.
 		 * @param {Function} [callback] Callback that should be run once the data has been retrieved.
 		 */
 		public getArchivedPhotosData(month: number, year: number, callback: Function): void {
-			var _this = this;
+			let _this = this;
 
 			this.getArchivedPhotoUrls(month, year, function (photoPageUrls: string[]) {
-				var photoData: photoData[] = [];
+				let photoData: photoData[] = [];
 
 				for (var i = 0; i < photoPageUrls.length; i++) {
 					_this.getDataFromPage(function (data: photoData) {
@@ -218,7 +242,7 @@ namespace natGeo {
 		 * Get URLs for the photo of the day from the archive, sorted by latest first in a given month and year.
 		 * 
 		 * @param {number} month The month to get the archived photos for (ranging from 1 to 12).
-		 * @param {number} year The year to get the archived photos for.
+		 * @param {number} year The full year (such as 2016) to get the archived photos for.
 		 * @param {Function} [callback] Callback that should be run once the URLs for the photo pages have been retrieved.
 		 */
 		public getArchivedPhotoUrls(month: number, year: number, callback: Function) {

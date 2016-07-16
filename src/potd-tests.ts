@@ -22,7 +22,7 @@ describe('potd', function() {
         let potd = new natGeo.photoOfTheDay();
 
         let expectedData = {
-            url: 'http://photos.nationalgeographic.com/wpf/media-live/photos/000/952/cache/skye-scotland-seal_95219_990x742.jpg',
+            url: 'http://images.nationalgeographic.com/wpf/media-live/photos/000/952/cache/skye-scotland-seal_95219_990x742.jpg',
             date: new Date('JULY 8, 2016'),
             name: 'The Water\'s Fine',
             credit: 'Photograph by Igor Mohoric Bonca, National Geographic Your Shot',
@@ -128,7 +128,6 @@ describe('potd', function() {
         })
     });
 
-    /*
     it('getAllArchivedPhotoUrlsSync() should return a large array of strings', function() {
         let potd = new natGeo.photoOfTheDay();
 
@@ -137,17 +136,15 @@ describe('potd', function() {
         // At the time of writing, there are over 2500 photos.
         expect(urls.length).to.be.above(2500);
     });
-    */
 
-    /*
     it('getAllArchivedPhotoUrls() should return multiple arrays of strings', function(done) {
         this.timeout(100000);
 
         let potd = new natGeo.photoOfTheDay();
         let i = 0;
 
-        potd.getAllArchivedPhotoUrls(function(urls: string[], done: boolean) {
-            if (done) {
+        potd.getAllArchivedPhotoUrls(function(urls: string[], finished: boolean) {
+            if (finished) {
                 expect(i).to.be.above(70);
 
                 done();
@@ -156,5 +153,16 @@ describe('potd', function() {
             i++;
         }, 200);
     });
-    */
+
+    it('getDataByDate() shoukd return data with correct date', function(done) {
+        this.timeout(4000);
+
+        let potd = new natGeo.photoOfTheDay();
+
+        potd.getDataByDate('2016/02/07', function(data: any) {
+            expect(data.date.getTime()).to.equal(new Date('FEBRUARY 7, 2016').getTime(  ));
+
+            done();
+        });
+    });
 });
