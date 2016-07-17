@@ -8,14 +8,14 @@ import cheerio = require('cheerio');
 import request = require('request');
 var syncRequest = require('sync-request');
 
-namespace natGeo {
+export namespace nationalGeographic {
 	/**
 	 * The config that is parsed into the main method.
 	 * 
 	 * @export
 	 * @interface Config
 	 */
-	interface config {
+	export interface config {
 		/**
 		 * The base URL end point for the remote server such as 'http://photography.nationalgeographic.com'.
 		 * 
@@ -47,7 +47,7 @@ namespace natGeo {
 	 * @export
 	 * @interface ImageData
 	 */
-	interface photoData {
+	export interface photoData {
 		/**
 		 * URL to the photo itself.
 		 * 
@@ -427,4 +427,4 @@ namespace natGeo {
 	}
 }
 
-module.exports = natGeo;
+module.exports = nationalGeographic;

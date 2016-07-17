@@ -42,7 +42,7 @@ potd.getDataFromPage(function(data) {
 ### Todo
 
 - [x] Make github repo
-- [ ] Fix typing file for TypeScript (.d.ts)
+- [x] Fix typing file for TypeScript (.d.ts)
 - [ ] Separate out interfaces and classes
 - [ ] Publish NPM package.
 - [ ] Build REST API

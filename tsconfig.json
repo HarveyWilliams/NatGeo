@@ -8,9 +8,10 @@
 		"preserveConstEnums": true,
 		"declaration": true,
         "sourceMap": true,
-        "noResolve": true
+        "noResolve": false,
+        "outDir": "lib"
     },
-    "exclude": [
-        "node_modules"
+    "files": [
+        "./src/potd.ts"
     ]
 }
