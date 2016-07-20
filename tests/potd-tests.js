@@ -245,4 +245,21 @@ describe('potd', function() {
             rmdir.sync(savePath);
         });
     });
+
+    it.only('new natGeo.photoOfTheDay() should correctly set config options', function() {
+        let potd = new natGeo.photoOfTheDay({
+            waitTime: 12345
+        });
+
+        expect(potd.config.waitTime).to.equal(12345);
+
+        potd = new natGeo.photoOfTheDay({
+            baseUrl: 'http://path.to/website'
+        });
+
+        expect(potd.config.baseUrl).to.equal('http://path.to/website');
+        expect(potd.config.waitTime).to.equal(100);
+        expect(potd.config.savePhotoDirectory).to.equal(null);
+        expect(potd.config.saveDataDirectory).to.equal(null);
+    });
 });

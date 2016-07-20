@@ -89,26 +89,30 @@ export namespace nationalGeographic {
 	 */
 	export class photoOfTheDay {
 		/**
+		 * Config options.
+		 * 
+		 * @type {config}
+		 */
+		public config: config;
+
+		/**
 		 * Default constructor.
 		 * 
 		 * @type {Config} Configure the instance of the photo scraper.
 		 */
-		constructor(public config?: config) {
-			if (config == null) {
-				config = {
-					baseUrl: null,
-					saveDataDirectory: null,
-					savePhotoDirectory:  null,
-					waitTime:  100
-				};
-			}
+		constructor({
+				baseUrl = 'http://photography.nationalgeographic.com',
+				saveDataDirectory =  null,
+				savePhotoDirectory = null,
+				waitTime =  100
+			}: config) {
 
 			this.config = {
-				baseUrl: config.baseUrl || 'http://photography.nationalgeographic.com',
-				saveDataDirectory: config.saveDataDirectory || null,
-				savePhotoDirectory: config.savePhotoDirectory || null,
-				waitTime: config.waitTime || 100
-			};
+				baseUrl: baseUrl,
+				saveDataDirectory: saveDataDirectory,
+				savePhotoDirectory: savePhotoDirectory,
+				waitTime: waitTime
+			}
 		}
 
 		/**
@@ -451,7 +455,7 @@ export namespace nationalGeographic {
 				callback();
 			});
 		}
-		
+
 		/**
 		 * Get the extension of a file from either it's path (including file name) or just the file name.
 		 * 
