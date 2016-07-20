@@ -7,6 +7,7 @@
 
 var fs = require('fs');
 var chai = require('chai');
+var rmdir = require('rimraf');
 
 var expect = chai.expect;
 
@@ -181,10 +182,17 @@ describe('potd', function() {
         });
     });
 
-    it('getDataFromPage() should save JSON data to a file', function(done) {
+    it.only('getDataFromPage() should save JSON data to a file', function(done) {
         this.timeout(4000);
 
-        let savePath = process.cwd() + '\\data\\';
+        let savePath = process.cwd() + '\\data-temp\\';
+
+        // Delete the temp directory to ensure that no files already exist in it.
+        if (fs.existsSync(savePath)) {
+            rmdir.sync(savePath);
+        }
+
+        fs.mkdirSync(savePath);
 
         let potd = new natGeo.photoOfTheDay({
             saveDataDirectory: savePath
@@ -193,11 +201,12 @@ describe('potd', function() {
         potd.getDataFromPage(function(data) {
             let fileNameShouldBe = `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.json`;
 
-            console.log(savePath + fileNameShouldBe);
-
             expect(fs.existsSync(savePath + fileNameShouldBe)).to.equal(true);
 
             done();
+
+            // Cleanup...
+            rmdir.sync(savePath);
         });
     });
 
@@ -212,7 +221,14 @@ describe('potd', function() {
     it('getDataFromPage() should save the retrieved photo to a file', function(done) {
         this.timeout(4000);
 
-        let savePath = process.cwd() + '\\photos\\';
+        let savePath = process.cwd() + '\\photos-temp\\';
+
+        // Delete the temp directory to ensure that no files already exist in it.
+        if (fs.existsSync(savePath)) {
+            rmdir.sync(savePath);
+        }
+
+        fs.mkdirSync(savePath);
 
         let potd = new natGeo.photoOfTheDay({
             savePhotoDirectory: savePath
@@ -221,9 +237,12 @@ describe('potd', function() {
         potd.getDataFromPage(function(data) {
             let fileNameShouldBe = `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.` + potd.getExtension(data.url);;
 
-            //expect(fs.existsSync(savePath + fileNameShouldBe)).to.equal(true);
+            expect(fs.existsSync(savePath + fileNameShouldBe)).to.equal(true);
 
             done();
+
+            // Cleanup...
+            rmdir.sync(savePath);
         });
     });
 });
