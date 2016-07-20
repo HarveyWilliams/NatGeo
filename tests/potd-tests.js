@@ -246,7 +246,7 @@ describe('potd', function() {
         });
     });
 
-    it.only('new natGeo.photoOfTheDay() should correctly set config options', function() {
+    it('new natGeo.photoOfTheDay() should correctly set config options', function() {
         let potd = new natGeo.photoOfTheDay({
             waitTime: 12345
         });
