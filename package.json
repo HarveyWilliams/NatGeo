@@ -1,6 +1,7 @@
 {
-  "name": "iotd",
+  "name": "potd",
   "main": "./lib/potd.js",
+  "typings": "./lib/potd.d.ts",
   "version": "0.0.1",
   "description": "Scrapes photos of the day from National Geographic.",
   "contributors": [
@@ -8,7 +9,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "harveywilliams.net"
+    "url": "https://github.com/HarveyWilliams/NatGeo"
   },
   "dependencies": {
     "cheerio": "^0.20.0",
