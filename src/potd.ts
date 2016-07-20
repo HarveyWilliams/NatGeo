@@ -41,6 +41,7 @@ export namespace nationalGeographic {
 		 */
 		waitTime: number;
 	}
+
 	/**
 	 * The photo data scraped from the HTML page.
 	 * 
@@ -79,6 +80,7 @@ export namespace nationalGeographic {
 		 */
 		description: string;
 	}
+
 	/**
 	 * Methods for getting the current photo of hte day and previous photos of the day.
 	 * 
@@ -108,6 +110,7 @@ export namespace nationalGeographic {
 				waitTime: config.waitTime || 100
 			};
 		}
+
 		/**
 		 * Get a single photos data by the date the photo was published.
 		 * If you are building a local archive of all of the photos, this method might not be for you! It makes two calls to National Geographic for every photo scraped. Use 'getAllArchivedPhotoData()' instead.
@@ -132,6 +135,7 @@ export namespace nationalGeographic {
 
 			return;
 		}
+
 		/**
 		 * Get data for photos from the archive.
 		 * 
@@ -156,6 +160,7 @@ export namespace nationalGeographic {
 				return;
 			});
 		}
+
 		/**
 		 * Get all photos as data.
 		 * 
@@ -175,6 +180,7 @@ export namespace nationalGeographic {
 				}
 			}, waitTime);
 		}
+
 		/**
 		 * Get all photos.
 		 * 
@@ -207,6 +213,7 @@ export namespace nationalGeographic {
 				return;
 			}
 		}
+
 		/**
 		 * Get all photos.
 		 * Warning: this function may take a long time to complete as it requests each page after the other. IT COULD EVEN DDOS the site.
@@ -229,6 +236,7 @@ export namespace nationalGeographic {
 
 			return allUrls;
 		}
+
 		/**
 		 * Get URLs for the photo of the day fron the archive, sorted by latest released first.
 		 * This method is not recommended as the web page may take a long time to respond.
@@ -240,6 +248,7 @@ export namespace nationalGeographic {
 
 			return this.getArchivedPhotosFromHtml(syncRequest('GET', url).getBody());
 		}
+
 		/**
 		 * Get URLs for the photo of the day fron the archive, sorted by latest released first.
 		 * 
@@ -267,6 +276,7 @@ export namespace nationalGeographic {
 				return;
 			})
 		}
+
 		/**
 		 * Get URLs for the photo of the day from the archive, sorted by latest first in a given month and year.
 		 * 
@@ -295,6 +305,7 @@ export namespace nationalGeographic {
 				return;
 			});
 		}
+
 		/**
 		* Loads photo information from a National Geographic page.
 		* 
@@ -318,7 +329,7 @@ export namespace nationalGeographic {
 				let extension = _this.getExtension(data.url);
 
 				// TODO: Figure out this mess...
-				
+
 				if (_this.config.savePhotoDirectory != null) {
 					_this.savePhoto(data.url, _this.config.savePhotoDirectory, `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.${extension}`, function() {
 						if (_this.config.saveDataDirectory == null) {
@@ -338,6 +349,7 @@ export namespace nationalGeographic {
 				}
 			});
 		}
+
 		/**
 		 * Loads photo information from a National Geographic page synchronously.
 		 * 
@@ -347,6 +359,7 @@ export namespace nationalGeographic {
 		public getDataFromPageSync(url: string = this.config.baseUrl + 'photography/photo-of-the-dat/'): photoData {
 			return this.getDataFromHtml((syncRequest('GET', url).getBody()));
 		}
+
 		/**
 		 * Load data about an photo from an HTML document.
 		 * 
@@ -366,6 +379,7 @@ export namespace nationalGeographic {
 				callback(_this.getDataFromHtml(html));
 			});
 		}
+
 		/**
 		 * Load a list of URLs from an HTML document. HTML page should be a page containg archived photos.
 		 * 
@@ -383,6 +397,7 @@ export namespace nationalGeographic {
 
 			return pages;
 		}
+
 		/**
 		 * Loads data from an HTML string.
 		 * 
@@ -402,6 +417,7 @@ export namespace nationalGeographic {
 			
 			return photoData;
 		}
+
 		/**
 		 * Retrieve an photo from a URL and saves it to a place on the file system.
 		 * 
@@ -415,6 +431,7 @@ export namespace nationalGeographic {
 
 			request(url).pipe(fs.createWriteStream(filePath + fileName)).on('close', callback);
 		}
+
 		/**
 		 * Save an object to a file.
 		 * 
@@ -434,6 +451,7 @@ export namespace nationalGeographic {
 				callback();
 			});
 		}
+		
 		/**
 		 * Get the extension of a file from either it's path (including file name) or just the file name.
 		 * 
