@@ -315,17 +315,27 @@ export namespace nationalGeographic {
 				}
 
 				let data = _this.getDataFromHtml(html);
-				let extension = data.url.split('.')[data.url.split('.').length - 1] ;
+				let extension = _this.getExtension(data.url);
 
+				// TODO: Figure out this mess...
+				
 				if (_this.config.savePhotoDirectory != null) {
-					_this.savePhoto(data.url, _this.config.savePhotoDirectory, `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.${extension}`);
+					_this.savePhoto(data.url, _this.config.savePhotoDirectory, `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.${extension}`, function() {
+						if (_this.config.saveDataDirectory == null) {
+							callback(data);
+						}
+					});
 				}
 
 				if (_this.config.saveDataDirectory != null) {
-					_this.saveData(data, _this.config.saveDataDirectory, `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.json`);
+					_this.saveData(data, _this.config.saveDataDirectory, `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.json`, function() {
+						if (_this.config.savePhotoDirectory == null) {
+							callback(data);
+						}
+					});
+				} else if (_this.config.savePhotoDirectory == null) {
+					callback(data);
 				}
-
-				callback(data);
 			});
 		}
 		/**
@@ -423,6 +433,15 @@ export namespace nationalGeographic {
 
 				callback();
 			});
+		}
+		/**
+		 * Get the extension of a file from either it's path (including file name) or just the file name.
+		 * 
+		 * @param {string} pathOrName Either the path to the file (with file name) or just the name of the file.
+		 * @returns A file type such as "json" or "jpg".
+		 */
+		public getExtension(pathOrName: string) {
+			return pathOrName.split('.')[pathOrName.split('.').length - 1];
 		}
 	}
 }

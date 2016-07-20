@@ -1,6 +1,7 @@
 /// <reference path="../typings/node/node.d.ts"/>
 /// <reference path="../typings/mocha/mocha.d.ts"/>
 /// <reference path="../typings/chai/chai.d.ts"/>
+/// <reference path="../lib/potd.d.ts"/>
 
 "use-strict";
 
@@ -46,6 +47,8 @@ describe('potd', function() {
 
     // 31 days in January.
     it('getArchivedPhotoUrls() should return an array of length 31 for January', function(done) {
+        this.timeout(4000);
+
         let potd = new natGeo.photoOfTheDay();
 
         potd.getArchivedPhotoUrls(1, 2016, function(data) {
@@ -56,6 +59,8 @@ describe('potd', function() {
     });
 
     it('getArchivedPhotoUrls() should return URLs', function(done) {
+        this.timeout(4000);
+
         let potd = new natGeo.photoOfTheDay();
 
         potd.getArchivedPhotoUrls(1, 2016, function(data) {
@@ -112,6 +117,8 @@ describe('potd', function() {
 
     // Currently, the latest archived photos return in a 6 by 6 grid (36 photos).
     it('getLatestArchivedPhotoUrls() should return an array of length 36', function(done) {
+        this.timeout(4000);
+
         let potd = new natGeo.photoOfTheDay();
 
         potd.getLatestArchivedPhotoUrls(1, function(data) {
@@ -123,6 +130,8 @@ describe('potd', function() {
 
     // If the pagination is out of range, no photos are available but the page still renders. I'm gonna assume that there will never be 1,000,000 pages...
     it('getLatestArchivedPhotoUrls(1000000) should return an array of length 0', function(done) {
+        this.timeout(4000);
+
         let potd = new natGeo.photoOfTheDay();
 
         potd.getLatestArchivedPhotoUrls(1000000, function(data) {
@@ -133,6 +142,8 @@ describe('potd', function() {
     });
 
     it('getAllArchivedPhotoUrlsSync() should return a large array of strings', function() {
+        this.timeout(100000);
+
         let potd = new natGeo.photoOfTheDay();
 
         let urls = potd.getAllArchivedPhotoUrlsSync();
@@ -171,6 +182,8 @@ describe('potd', function() {
     });
 
     it('getDataFromPage() should save JSON data to a file', function(done) {
+        this.timeout(4000);
+
         let savePath = process.cwd() + '\\data\\';
 
         let potd = new natGeo.photoOfTheDay({
@@ -183,6 +196,32 @@ describe('potd', function() {
             console.log(savePath + fileNameShouldBe);
 
             expect(fs.existsSync(savePath + fileNameShouldBe)).to.equal(true);
+
+            done();
+        });
+    });
+
+    it('getExtension() should get the extension of a file', function() {
+        let potd = new natGeo.photoOfTheDay();
+
+        expect(potd.getExtension('test.json')).to.equal('json');
+        expect(potd.getExtension('C:\\Path\To\File.png')).to.equal('png');
+        expect(potd.getExtension('http://test.com/directory/file.jpg')).to.equal('jpg');
+    });
+
+    it('getDataFromPage() should save the retrieved photo to a file', function(done) {
+        this.timeout(4000);
+
+        let savePath = process.cwd() + '\\photos\\';
+
+        let potd = new natGeo.photoOfTheDay({
+            savePhotoDirectory: savePath
+        });
+
+        potd.getDataFromPage(function(data) {
+            let fileNameShouldBe = `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.` + potd.getExtension(data.url);;
+
+            //expect(fs.existsSync(savePath + fileNameShouldBe)).to.equal(true);
 
             done();
         });
