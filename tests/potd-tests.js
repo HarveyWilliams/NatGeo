@@ -18,6 +18,7 @@ describe('potd', function() {
         let potd = new natGeo.photoOfTheDay();
 
         potd.getDataFromPage(function(data) {
+            console.log(data);
             expect(typeof data).to.equal('object')
 
             done();
@@ -182,7 +183,7 @@ describe('potd', function() {
         });
     });
 
-    it.only('getDataFromPage() should save JSON data to a file', function(done) {
+    it('getDataFromPage() should save JSON data to a file', function(done) {
         this.timeout(4000);
 
         let savePath = process.cwd() + '\\data-temp\\';
@@ -261,5 +262,73 @@ describe('potd', function() {
         expect(potd.config.waitTime).to.equal(100);
         expect(potd.config.savePhotoDirectory).to.equal(null);
         expect(potd.config.saveDataDirectory).to.equal(null);
+
+        potd = new natGeo.photoOfTheDay();
+
+        expect(potd.config.savePhotoDirectory).to.equal(null);
+    });
+
+    it('getData() should get photo data from a file', function(done) {
+        this.timeout(4000);
+        
+        let savePath = process.cwd() + '\\data-temp\\';
+
+        // Delete the temp directory to ensure that no files already exist in it.
+        if (fs.existsSync(savePath)) {
+            rmdir.sync(savePath);
+        }
+
+        fs.mkdirSync(savePath);
+
+        let potd = new natGeo.photoOfTheDay({
+            saveDataDirectory: savePath
+        });
+
+        potd.getDataFromPage(function(data) {
+            let fileName = `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.json`;
+
+            potd.getData(fileName, function(fileData) {
+                expect(data.url).to.equal(fileData.url);
+                expect(new Date(data.date).getTime()).to.equal(new Date(fileData.date).getTime());
+                expect(data.name).to.equal(fileData.name);
+                expect(data.credit).to.equal(fileData.credit);
+                expect(data.description).to.equal(fileData.description);
+
+                done();
+
+                // Cleanup...
+                rmdir.sync(savePath);
+            });
+        });
+    });
+
+    it('getAllArchivedPhotoData() should get all archived photo data', function() {
+        this.timeout(1000000);
+
+        let dataPath = process.cwd() + '\\data\\';
+
+        if (fs.existsSync(dataPath)) {
+            rmdir.sync(dataPath);
+        }
+
+        fs.mkdirSync(dataPath);
+
+        let photoPath = process.cwd() + '\\photos\\';
+
+        if (fs.existsSync(photoPath)) {
+            rmdir.sync(photoPath);
+        }
+
+        fs.mkdirSync(photoPath);
+
+        let potd = new natGeo.photoOfTheDay({
+            saveDataDirectory: dataPath,
+            savePhotoDirectory: photoPath,
+            useCache: true
+        });
+
+        potd.getAllArchivedPhotoData(function(data) {
+            console.log(data);
+        }, 1000);
     });
 });

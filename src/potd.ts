@@ -22,24 +22,35 @@ export namespace nationalGeographic {
 		 * @type {string}
 		 */
 		baseUrl: string;
+
 		/**
 		 * If specified, this will be the location where the JSON blobs of photo data should be saved after it has been retrieved.
 		 * 
 		 * @type {string}
 		 */
 		saveDataDirectory: string;
+
 		/**
 		 * If specified, this will be the location where the photo file should be saved after it has been retrieved.
 		 * 
 		 * @type {string}
 		 */
 		savePhotoDirectory: string;
+		
 		/**
 		 * The wait time before successive calls should be made to the remote server.
 		 * 
 		 * @type {number}
 		 */
 		waitTime: number;
+
+		/**
+		 * Weather photo and/or data results should be retrieved from the local photo and/or data file system cache.
+		 * Requries either the savePhotoDirectory or saveDataDirectory to be set.
+		 * 
+		 * @type {Boolean}
+		 */
+		useCache: Boolean;
 	}
 
 	/**
@@ -55,24 +66,28 @@ export namespace nationalGeographic {
 		 * @type {string}
 		 */
 		url: string;
+
 		/**
 		 * Date the photo was posted.
 		 * 
 		 * @type {Date}
 		 */
 		date: Date;
+
 		/**
 		 * Name of the photo.
 		 * 
 		 * @type {string}
 		 */
 		name: string;
+
 		/**
 		 * Photographer credit.
 		 * 
 		 * @type {string}
 		 */
 		credit: string;
+
 		/**
 		 * Information about the photo itself.
 		 * 
@@ -104,14 +119,22 @@ export namespace nationalGeographic {
 				baseUrl = 'http://photography.nationalgeographic.com',
 				saveDataDirectory =  null,
 				savePhotoDirectory = null,
-				waitTime =  100
-			}: config) {
+				waitTime =  100,
+				useCache = true
+			}: config = {
+				baseUrl: 'http://photography.nationalgeographic.com',
+				saveDataDirectory:  null,
+				savePhotoDirectory: null,
+				waitTime:  100,
+				useCache: true
+			}) {
 
 			this.config = {
 				baseUrl: baseUrl,
 				saveDataDirectory: saveDataDirectory,
 				savePhotoDirectory: savePhotoDirectory,
-				waitTime: waitTime
+				waitTime: waitTime,
+				useCache: useCache
 			}
 		}
 
@@ -174,15 +197,31 @@ export namespace nationalGeographic {
 		public getAllArchivedPhotoData(callback: Function, waitTime: number = this.config.waitTime): void {
 			let _this = this;
 
-			this.getAllArchivedPhotoUrls(function(urls: string[], done: boolean) {
-				if (done) {
-					return;
-				}
+			let getUrls = function(page: number) {
+				let urls = _this.getLatestArchivedPhotoUrlsSync(page);
 
-				for (let url of urls) {
-					callback(_this.getDataFromPageSync(url));
-				}
-			}, waitTime);
+				timeout(function() {
+					getUrls(page + 1);
+				}, urls, urls[0]);
+			};
+
+			let timeout = function(completedCallback: Function, urls: string[], currentUrl: string) {
+				setTimeout(function() {
+					_this.getDataFromPage(function(data: photoData) {
+						callback(data);
+
+						if (urls.indexOf(currentUrl) + 1 == urls.length) {
+							setTimeout(function() {
+								completedCallback();
+							}, waitTime);
+						} else {
+							timeout(completedCallback, urls, urls[urls.indexOf(currentUrl) + 1]);
+						}
+					}, currentUrl);
+				}, waitTime);
+			};
+
+			getUrls(1);
 		}
 
 		/**
@@ -198,8 +237,7 @@ export namespace nationalGeographic {
 
 			let timeout = function() {
 				setTimeout(function() {
-					let tempI = i;
-					let urls = _this.getLatestArchivedPhotoUrlsSync(tempI);
+					let urls = _this.getLatestArchivedPhotoUrlsSync(i);
 
 					callback(urls, urls.length == 0);
 
@@ -319,39 +357,70 @@ export namespace nationalGeographic {
 		public getDataFromPage(callback: Function, url: string = this.config.baseUrl + '/photography/photo-of-the-day/') {
 			let _this = this;
 
-			request({
-				method: 'GET',
-				url: url
-			}, function (err, response, html) {
-				if (err) {
-					console.log('[backgrounds]', err);
+			let requestData = function() {
+				request({
+					method: 'GET',
+					url: url
+				}, function (err, response, html) {
+					let waitingForSavePhoto = false;
+					let waitingForSaveData = false;
+					let callbackRan = false;
 
-					return;
-				}
+					if (err) {
+						console.log('[backgrounds]', err);
 
-				let data = _this.getDataFromHtml(html);
-				let extension = _this.getExtension(data.url);
+						return;
+					}
 
-				// TODO: Figure out this mess...
+					let data = _this.getDataFromHtml(html);
+					let extension = _this.getExtension(data.url);
 
-				if (_this.config.savePhotoDirectory != null) {
-					_this.savePhoto(data.url, _this.config.savePhotoDirectory, `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.${extension}`, function() {
-						if (_this.config.saveDataDirectory == null) {
-							callback(data);
-						}
-					});
-				}
+					if (_this.config.savePhotoDirectory != null) {
+						waitingForSavePhoto = true;
 
-				if (_this.config.saveDataDirectory != null) {
-					_this.saveData(data, _this.config.saveDataDirectory, `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.json`, function() {
-						if (_this.config.savePhotoDirectory == null) {
-							callback(data);
-						}
-					});
-				} else if (_this.config.savePhotoDirectory == null) {
-					callback(data);
-				}
-			});
+						_this.savePhoto(data.url, _this.config.savePhotoDirectory, `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.${extension}`, function() {
+							if (!callbackRan) {
+								callbackRan = true;
+
+								callback(data);
+							}
+						});
+					}
+
+					if (_this.config.saveDataDirectory != null) {
+						waitingForSaveData = true;
+
+						_this.saveData(data, _this.config.saveDataDirectory, `${data.date.getDate()}-${data.date.getMonth() + 1}-${data.date.getFullYear()}.json`, function() {
+							if (!callbackRan) {
+								callbackRan = true;
+
+								callback(data);
+							}
+						});
+					}
+
+					if (!waitingForSavePhoto && !waitingForSaveData) {
+						callback(data);
+					}
+				});
+			};
+
+			if (this.config.useCache && this.config.saveDataDirectory != null && url == this.config.baseUrl + '/photography/photo-of-the-day/') {
+				let date = new Date();
+				let fileName = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}.json`;
+
+				this.getData(fileName, function(data: photoData) {
+					if (data != null) {
+						callback(data);
+
+						return;
+					} else {
+						requestData();
+					}
+				});
+			} else {
+				requestData();
+			}
 		}
 
 		/**
@@ -454,6 +523,36 @@ export namespace nationalGeographic {
 
 				callback();
 			});
+		}
+
+		/**
+		 * Gets image data from the local file system.
+		 * 
+		 * @param {string} fileName The name of the file including the extension. Do not include the entire path.
+		 * @param {Function} callback The callback that is always run after the file has been read. Returns null if the file does not exist.
+		 */
+		public getData(fileName: string, callback: Function): void {
+			let _this = this;
+
+			fs.readFile(_this.config.saveDataDirectory + fileName, 'utf8', function(err, data) {
+				if (err) {
+					callback(null);
+				} else {
+					callback(JSON.parse(data));
+				}
+			});
+		}
+
+		/**
+		 * Get iamge data from the local file system.
+		 * 
+		 * @param {string} fileName The name of the file including the extension. Do not include the entire path.
+		 * @returns {photoData}
+		 */
+		public getDataSync(fileName: string): photoData {
+			let _this = this;
+			
+			return JSON.parse(fs.readFileSync(_this.config.saveDataDirectory + fileName, 'utf8'));
 		}
 
 		/**
