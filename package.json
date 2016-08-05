@@ -17,6 +17,9 @@
     "sync-request": "^3.0.1"
   },
   "devDependencies": {
+    "cheerio": "^0.20.0",
+    "request": "^2.69.0",
+    "sync-request": "^3.0.1",
     "chai": "^3.5.0",
     "gulp": "^3.9.0",
     "gulp-autoprefixer": "^2.3.1",
